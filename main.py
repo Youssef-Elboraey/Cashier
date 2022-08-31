@@ -1,17 +1,17 @@
 from os import system , remove
 import sqlite3
-from sys import argv
-from time import sleep
+from sys import argv , platform
+from colorama import Fore
 #######################
 def OutPutHundeler(function):
 
-    def Decoration(*args):
+    def Hundeler(*args):
 
-        print (f"Name\t\tAmount\t\tStatus")
+        print (f"Name\t\t\tAmount\t\t\tStatus")
 
         function(*args)
 
-    return Decoration
+    return Hundeler
 
 # def DatabaseHundeler(function):
 
@@ -27,18 +27,26 @@ def OutPutHundeler(function):
 
 #     return Hundeler
 
+#print (str(system("pwd")).replace("0" , "") + str("/Database/app.db"))
+
 class Cashier:
 
-    def __init__(self , Name=None , amount=None):
+    def __init__(self , Name=None , Amount=None):
 
-        self.Database = sqlite3.connect("Database/app.db")
-        self.cr = self.Database.cursor()
-        self.name = str(Name).capitalize()
-        self.amount = amount
-        self.cr.execute("select * from Clients")
-        self.clients = self.cr.fetchall()
-        self.cr.execute("select * from Amounts")
-        self.amounts = self.cr.fetchall()
+        try:
+
+            self.Database = sqlite3.connect("/data/data/com.termux/files/home/Cashier/Database/app.db")
+            self.cr = self.Database.cursor()
+            self.name = str(Name).strip().capitalize()
+            self.amount = Amount
+            self.cr.execute("select * from Clients")
+            self.clients = self.cr.fetchall()
+            self.cr.execute("select * from Amounts")
+            self.amounts = self.cr.fetchall()
+
+        except IndexError:
+
+            pass
 
     def save(self):
 
@@ -46,44 +54,79 @@ class Cashier:
 
     def Default(self):
 
-        system("cls")
+        if (platform == "linux"):
 
-        print("Return To Defualt (It Will DELETE DATABASE And Create It Again)!\t(Yes/No)" , end="\n")
-
-        sleep(2)
-
-        confirm = input("Confirm: ").capitalize().strip()
-
-        if (argv[2] != "Y.Elbor3y"):
-
-            sleep(1.5)
-
-            print("ACCESS DENIED!")
-
-            sleep(1.5)
-
-        elif (confirm == "Yes" and argv[2] == "Y.Elbor3y".strip()):
-
-            self.Database.close()
-
-            remove("Database/app.db")
-
-            self.Database = sqlite3.connect("Database/app.db")
-
-            self.Database.execute("CREATE TABLE IF NOT EXISTS `Clients` ('ID' INT UNIQUE , 'Name' TEXT);")
-            self.Database.execute("CREATE TABLE IF NOT EXISTS `Amounts` ('Client_ID' INT UNIQUE , 'Amount' TEXT);")
-
-            print("Done")
+            system("clear")
 
         else:
 
-            print("Oparation CANCELED!")
+            system("cls")
+
+        Username = input ("Enter Username: ")
+
+        if (Username == "Y.Elbor3y"):
+
+#            print("Return To Defualt (It Will DELETE Database And Create It Again)!\tAre You Sure: (Yes/No)" , end="\n")
+
+            confirm = input("Confirm: ").capitalize().strip()
+
+            if (confirm == "Yes"):
+
+                self.Database.close()
+
+                remove("/data/data/com.termux/files/home/Cashier/Database/app.db")
+
+                self.Database = sqlite3.connect("/data/data/com.termux/files/home/Cashier/Database/app.db")
+
+                self.Database.execute("CREATE TABLE IF NOT EXISTS `Clients` ('ID' INT UNIQUE , 'Name' TEXT);")
+                self.Database.execute("CREATE TABLE IF NOT EXISTS `Amounts` ('Client_ID' INT UNIQUE , 'Amount' TEXT);")
+
+                print(Fore.LIGHTGREEN_EX + "Done")
+
+            else:
+
+                print(Fore.YELLOW + "Oparation CANCELED!")
+
+        else:
+
+            print (Fore.LIGHTRED_EX + "ACCESS DENIED")
 
     def add(self):
 
+        Done = False
+
         if (len(self.clients) > 0):
 
-            # print(len(self.clients))
+            for client in range(len(self.clients)):
+
+                if self.name in self.clients[client]:
+
+                    client_id = self.clients[client][0]
+
+                    client_amount = self.amounts[client][1] 
+
+                    self.cr.execute(f"UPDATE Amounts SET Amount = {int(self.amount) + int(client_amount)} WHERE Client_ID = {client_id}")
+
+                    self.save()
+
+                    print (Fore.LIGHTGREEN_EX + "Client Has Been Updated Successfully!")
+
+                    Done = True
+
+                    break
+        if not Done:
+
+            self.cr.execute(f"INSERT INTO Clients VALUES ({len(self.clients) + 1} , '{self.name}')")
+            self.cr.execute(f"INSERT INTO Amounts VALUES ({len(self.clients) + 1} , '{self.amount}')")
+
+            self.save()
+
+            print (Fore.LIGHTGREEN_EX + "Done")
+
+    @OutPutHundeler
+    def search(self):
+
+        try:
 
             for client in self.clients:
 
@@ -91,59 +134,48 @@ class Cashier:
 
                     client_id = client[0]
 
-                    self.cr.execute(f"UPDATE Amounts SET Amount = {self.amount} WHERE Client_ID = {client_id}")
-
-                    self.save()
-
-                    print ("Client Has Been Updated Successfully!")
-
                     break
 
-                else:
-
-                    self.cr.execute(f"INSERT INTO Clients VALUES ({len(self.clients) + 1} , '{self.name}')")
-                    self.cr.execute(f"INSERT INTO Amounts VALUES ({len(self.clients) + 1} , '{self.amount}')")
-
-                    break
-
-        else:
-
-            self.cr.execute(f"INSERT INTO Clients VALUES ({len(self.clients) + 1} , '{self.name}')")
-            self.cr.execute(f"INSERT INTO Amounts VALUES ({len(self.clients) + 1} , '{self.amount}')")
-
-        self.save()
-
-    @OutPutHundeler
-    def search(self):
-
-        for client in self.clients:
-
-            if self.name == client[1]:
-
-                client_id = client[0]
-
-                break
-
-        for amount in self.amounts:
+            for amount in self.amounts:
 
                 if amount[0] == client_id:
 
-                    print(f"{client[1]}\t\t  {amount[1]}\t\tWaitting")
+                    print(f"{client[1]}\t\t\t  {amount[1]}\t\t\tWaitting")
 
                     break
 
+        except UnboundLocalError :
+
+            print (Fore.RED + "Client\t\t\t NOT\t\t\tFOUND!")
+
+        except :
+
+            print (Fore.YELLOW + "Unknown Error!")
+
     def delete(self):
 
-        for client in self.clients:
+        self.name = argv[2].capitalize()
 
-            if self.name == client[1]:
+        try:
 
-                client_id = client[0]
+            for client in self.clients:
 
-                break
+                if self.name == client[1]:
 
-        self.cr.execute(f"DELETE FROM Clients WHERE ID = '{client_id}'")
-        self.cr.execute(f"DELETE FROM Amounts WHERE Client_ID = '{client_id}'")
+                    client_id = client[0]
+
+                    break
+
+            self.cr.execute(f"DELETE FROM Clients WHERE ID = '{client_id}'")
+            self.cr.execute(f"DELETE FROM Amounts WHERE Client_ID = '{client_id}'")
+
+        except UnboundLocalError :
+
+            print(Fore.LIGHTBLUE_EX + "Client Already NOT In Database!")
+
+        except :
+
+            print (Fore.YELLOW + "Unknown Error!")
 
         self.save()
 
@@ -152,13 +184,13 @@ class Cashier:
 
         for client in range(len(self.clients)):
 
-                print(f"{self.clients[client][1]}\t\t  {self.amounts[client][1]}\t\tWaitting")
+                print(f"{self.clients[client][1]}\t\t\t  {self.amounts[client][1]}\t\t\tWaitting")
 
-if (len(argv) == 3):
+try:
 
     Client = Cashier(argv[1] , argv[2])
 
-elif(len(argv) == 2):
+except IndexError:
 
     Client = Cashier(argv[1])
 
