@@ -2,6 +2,7 @@ from os import system , remove
 import sqlite3
 from sys import argv , platform
 from colorama import Fore
+from pathlib import Path
 #######################
 def OutPutHundeler(function):
 
@@ -13,29 +14,13 @@ def OutPutHundeler(function):
 
     return Hundeler
 
-# def DatabaseHundeler(function):
-
-#     def Hundeler(*args):
-
-#         Cashier.Database = sqlite3.connect("Database/app.db")
-#         Cashier.cr = Cashier.Database.cursor()
-
-#         function(*args)
-
-#         Cashier.Database.commit()
-#         Cashier.Database.close()
-
-#     return Hundeler
-
-#print (str(system("pwd")).replace("0" , "") + str("/Database/app.db"))
-
 class Cashier:
 
     def __init__(self , Name=None , Amount=None):
 
         try:
 
-            self.Database = sqlite3.connect("/data/data/com.termux/files/home/Cashier/Database/app.db")
+            self.Database = sqlite3.connect(str (Path(__file__).parent.resolve()) + "/Database/app.db")
             self.cr = self.Database.cursor()
             self.name = str(Name).strip().capitalize()
             self.amount = Amount
@@ -66,17 +51,15 @@ class Cashier:
 
         if (Username == "Y.Elbor3y"):
 
-#            print("Return To Defualt (It Will DELETE Database And Create It Again)!\tAre You Sure: (Yes/No)" , end="\n")
-
             confirm = input("Confirm: ").capitalize().strip()
 
             if (confirm == "Yes"):
 
                 self.Database.close()
 
-                remove("/data/data/com.termux/files/home/Cashier/Database/app.db")
+                remove(str (Path(__file__).parent.resolve()) + "/Database/app.db")
 
-                self.Database = sqlite3.connect("/data/data/com.termux/files/home/Cashier/Database/app.db")
+                self.Database = sqlite3.connect(str (Path(__file__).parent.resolve()) + "/Database/app.db")
 
                 self.Database.execute("CREATE TABLE IF NOT EXISTS `Clients` ('ID' INT UNIQUE , 'Name' TEXT);")
                 self.Database.execute("CREATE TABLE IF NOT EXISTS `Amounts` ('Client_ID' INT UNIQUE , 'Amount' TEXT);")
