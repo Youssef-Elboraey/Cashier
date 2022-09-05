@@ -3,6 +3,7 @@ import sqlite3
 from sys import argv , platform
 from colorama import Fore
 from pathlib import Path
+from random import randint
 #######################
 def OutPutHundeler(function):
 
@@ -99,8 +100,10 @@ class Cashier:
                     break
         if not Done:
 
-            self.cr.execute(f"INSERT INTO Clients VALUES ({len(self.clients) + 1} , '{self.name}')")
-            self.cr.execute(f"INSERT INTO Amounts VALUES ({len(self.clients) + 1} , '{self.amount}')")
+            ID = randint(1 , 1000)
+
+            self.cr.execute(f"INSERT INTO Clients VALUES ({ID} , '{self.name}')")
+            self.cr.execute(f"INSERT INTO Amounts VALUES ({ID} , '{self.amount}')")
 
             self.save()
 
