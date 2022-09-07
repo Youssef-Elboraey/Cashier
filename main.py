@@ -4,6 +4,7 @@ from sys import argv , platform
 from colorama import Fore
 from pathlib import Path
 from random import randint
+from time import sleep
 #######################
 def OutPutHundeler(function):
 
@@ -72,6 +73,8 @@ class Cashier:
                 print(Fore.YELLOW + "Oparation CANCELED!")
 
         else:
+
+            sleep(1)
 
             print (Fore.LIGHTRED_EX + "ACCESS DENIED")
 
