@@ -79,6 +79,18 @@ class Cashier:
 
         print(Fore.LIGHTGREEN_EX + "Done" + Fore.RESET)
 
+    def delete_all(self):
+
+        if self.is_exists:
+
+            self.cursor.delete("Operations" , f"client_id = {self.get_id()}")
+
+            print (Fore.LIGHTGREEN_EX + f"All Operations To {argv[1]} Have Been Deleted" + Fore.RESET)
+
+        else:
+
+            print(Fore.LIGHTRED_EX + f"{argv[1]} Doesn't Exist" + Fore.RESET)
+
     def get_all(self):
 
         clients = self.cursor.select(["*"] , "Clients")
@@ -122,3 +134,7 @@ elif len(argv) == 2:
 elif len(argv) == 5:
 
     cashier.delete(argv[3] , argv[4])
+
+elif "-D" in argv or "--delete-all" in argv:
+
+    cashier.delete_all()
