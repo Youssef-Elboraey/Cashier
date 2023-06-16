@@ -8,8 +8,13 @@ class Cashier:
     def __init__(self):
 
         self.cursor = Cursor()
+        self.cursor.DB = self.cursor.ROOT_DIR + "Database/app.db"
+        self.cursor.connect()
+
         self.date = f"{datetime.now().year}-{datetime.now().month}-{datetime.now().day}"
-        self.is_exists = True if self.get_id() != None else False
+
+        self.is_exists = True if self.get_id() is not None else False
+        self.money = 0
 
     def get_id(self , Name: str = argv[1]):
 
@@ -41,7 +46,6 @@ class Cashier:
             self.cursor.insert("Clients_ids" , {"Name" : Name})
         
         self.cursor.insert("Operations" , {"client_id" : self.get_id() , "Operation" : Operation , "Amount" : Amount , "Date" : self.date})
-        self.cursor.insert("History" , {"client_id" : self.get_id() , "Operation" : Operation , "Amount" : Amount , "Date" : self.date})
 
         print (Fore.LIGHTGREEN_EX + "Done" + Fore.RESET)
 
@@ -99,6 +103,8 @@ class Cashier:
 
             self.show(Clients=[client[1]] , data=self.cursor.select(["id" , "Operation" , "Amount" , "Date"] , "Operations" , f"client_id = '{client[0]}'"))
 
+        print (f"Total Of Money Is: {self.money}")
+
     def show(self , Clients: str = [argv[1]] , data: list = []):
 
         total_of_amounts: int = 0
@@ -114,6 +120,8 @@ class Cashier:
                 print (f"    ID: {id}\n    Operation: {operation}\n    Amount: {amount}\n    Date: {date}\n")
         
         print(f"Total Of Amounts Is: {total_of_amounts}\n")
+
+        self.money += total_of_amounts
 
 cashier = Cashier()
 

@@ -3,21 +3,27 @@ from pathlib import Path
 
 class Database:
 
-    def __init__(self):
+    ROOT_DIR = (str(Path(__file__).parent.resolve()) + "/../")
 
-        self.ROOT_DIR = (str(Path(__file__).parent.resolve()) + "/../")
+    def __init__(self):    
 
-        self.DATABASE = self.ROOT_DIR + "Database/app.db"
+        self.DB = None
 
-        self.conn = sqlite3.connect(self.DATABASE)
+        self.connection = None
 
-        self.cursor = self.conn.cursor()
+        self.cursor = None
+
+    def connect(self):
+
+        self.connection = sqlite3.connect(self.DB)
+
+        self.cursor = self.connection.cursor()
 
     def commit(self):
 
-        self.conn.commit()
+        self.connection.commit()
 
     def close(self):
 
         self.cursor.close()
-        self.conn.close()
+        self.connection.close()

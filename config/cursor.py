@@ -10,6 +10,7 @@ class Cursor(Database):
         self.cursor.execute(f"INSERT INTO `{table}` ({columns}) VALUES ({values});")
 
         self.commit()
+        self.close()
 
     def update(self , table: str , data: dict , condition: str = "1 = 1"):
 
@@ -18,12 +19,14 @@ class Cursor(Database):
             self.cursor.execute(f"UPDATE `{table}` SET {column} = '{value}' WHERE {condition};")
 
         self.commit()
+        self.close()
 
     def delete(self , table: str , condition: str = "1 = 1"):
         
         self.cursor.execute(f"DELETE FROM {table} WHERE {condition};")
 
         self.commit()
+        self.close()
 
     def select(self , record: list , table: str , condition: str = "1 = 1"):
 
@@ -36,4 +39,6 @@ class Cursor(Database):
     def custom(self , query: str):
 
         self.cursor.execute(query)
+
         self.commit()
+        self.close()
